@@ -5,12 +5,18 @@
 		<title> 応用プログラミング 第9,10回 自由課題 (ap0901)
 		</title>
 		<style>
-		  body { margin: 0; background-color: #23a3a3; color: gold}
-
+		  body { margin: 0; background-color: #23a3a3; color: black}
+		  #status { font-size: x-large; color: yellow;}
 		</style>
 	</head>
 	<body>
-		<div id="output">G38400-2023 拓殖 太郎</div>
+		<div><table id="status">
+			<div>G284442022 河口歩夢 </div>
+			<td>予想結果: </td>
+			<td id="result-message"style=""></td>
+		</table>
+		</div>
+		<div id="output"></div>
 		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 		<script type="importmap"> {
 			"imports" : {
