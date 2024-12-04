@@ -71,14 +71,14 @@ const createCar = (color) => {
 
   // 座標点
   const v = [
-      new THREE.Vector3(carW / 2, 0, carL / 8),  // 0
-      new THREE.Vector3(carW / 2, 0, -carL / 2), // 1
-      new THREE.Vector3(carW / 2, LoofH, 0),     // 2
-      new THREE.Vector3(carW / 2, LoofH, -carL / 4), // 3 
-      new THREE.Vector3(-carW / 2, 0, carL / 8), // 4
-      new THREE.Vector3(-carW / 2, 0, -carL / 2), // 5
-      new THREE.Vector3(-carW / 2, LoofH, 0),    // 6
-      new THREE.Vector3(-carW / 2, LoofH, -carL / 4), // 7
+      new THREE.Vector3(carW / 2, 0, carL / 8),  
+      new THREE.Vector3(carW / 2, 0, -carL / 2), 
+      new THREE.Vector3(carW / 2, LoofH, 0),    
+      new THREE.Vector3(carW / 2, LoofH, -carL / 4), 
+      new THREE.Vector3(-carW / 2, 0, carL / 8), 
+      new THREE.Vector3(-carW / 2, 0, -carL / 2), 
+      new THREE.Vector3(-carW / 2, LoofH, 0), 
+      new THREE.Vector3(-carW / 2, LoofH, -carL / 4),
   ];
 
   // 車の作成
@@ -163,9 +163,8 @@ for (let i = 0; i < 4; i++) {
   startButton.style.top = "70px";
   startButton.style.left = "20px";
   startButton.style.padding = "10px";
-  startButton.style.backgroundColor = "#28a745";
+  startButton.style.backgroundColor = "green";
   startButton.style.color = "white";
-  startButton.style.border = "none";
   startButton.style.cursor = "pointer";
   startButton.style.fontSize = "16px";
   document.body.appendChild(startButton);
