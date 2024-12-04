@@ -13,7 +13,7 @@ import { GUI } from "ili-gui";
 function init() {
   // 制御変数の定義
   const param = {
-    axes: true, // 座標軸
+    axes: false, // 座標軸
     prediction: 1, // 予想する車（1〜4）
   };
 
@@ -123,7 +123,7 @@ const carColors = ["red", "blue", "green", "black"];
 const cars = [];
 for (let i = 0; i < 4; i++) {
   const car = createCar(carColors[i]);
-  car.position.set(-10, 2.5, i * 5 -7.5); // 車の初期位置
+  car.position.set(-15, 2.5, i * 5 -7.5); // 車の初期位置
   car.rotation.y = 0.5 * Math.PI;
   cars.push(car);
   scene.add(car);
@@ -188,7 +188,7 @@ for (let i = 0; i < 4; i++) {
     if (raceStarted && !raceFinished) {
       // 車をランダムに進める
       cars.forEach((car, index) => {
-        car.position.x += Math.random() * 0.3; // ランダムな速度
+        car.position.x += Math.random() * 0.2; // ランダムな速度
         if (car.position.x >= 20 && !winners.includes(carColors[index])) {
           winners.push(carColors[index]); // 色を格納
         }
