@@ -20,7 +20,7 @@ function init() {
   // GUIコントローラの設定
   const gui = new GUI();
   gui.add(param, "axes").name("座標軸");
-  gui.add(param, "prediction", { Red: 1, Blue: 2, Green: 3, Gold: 4 }).name("1位の予想");
+  gui.add(param, "prediction", { Red: 1, Blue: 2, Green: 3, Black: 4 }).name("1位の予想");
 
 
   // シーン作成
@@ -33,7 +33,7 @@ function init() {
   // カメラの作成
   const camera = new THREE.PerspectiveCamera(
     50, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set(10,15,20);
+  camera.position.set(55,20,15);
   camera.lookAt(0,0,0);
 
   // ゲーム状態管理
@@ -57,43 +57,90 @@ function init() {
 
 
   // レース用の車 (Mesh)
-  const carColors = ["赤", "青", "緑", "金",];
-  const carGeometry = new THREE.BoxGeometry(2, 1, 1); // 車の形状
-  const carMaterials = [
-    new THREE.MeshBasicMaterial({ color: "red" }),
-    new THREE.MeshBasicMaterial({ color: "blue" }),
-    new THREE.MeshBasicMaterial({ color: "green" }),
-    new THREE.MeshPhysicalMaterial({
-      color: 0xffaa00,
-      metalness: 1.0,             
-      roughness: 0.3,             
-      clearcoat: 1.0,            
-      clearcoatRoughness: 0.1,  
-    })
-  ];
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.3); // 弱めの環境光
-  scene.add(ambientLight);
+  // 車の作成（修正版）
+const createCar = (color) => {
+  // 素材の設定
+  const bodyMaterial = new THREE.MeshPhongMaterial({ color });
+  const tyreMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
 
-  const cars = [];
-  for (let i = 0; i < 4; i++) {
-    const car = new THREE.Mesh(carGeometry, carMaterials[i]);
-    car.position.set(-10, 0.5, i * 3 - 4); // 車の初期位置
-    cars.push(car);
-    scene.add(car);
+  // 車のサイズ
+  const carW = 3.6;
+  const carL = 8;
+  const carH = 1.5;
+  const LoofH = 1;
+
+  // 座標点
+  const v = [
+      new THREE.Vector3(carW / 2, 0, carL / 8),  // 0
+      new THREE.Vector3(carW / 2, 0, -carL / 2), // 1
+      new THREE.Vector3(carW / 2, LoofH, 0),     // 2
+      new THREE.Vector3(carW / 2, LoofH, -carL / 4), // 3 
+      new THREE.Vector3(-carW / 2, 0, carL / 8), // 4
+      new THREE.Vector3(-carW / 2, 0, -carL / 2), // 5
+      new THREE.Vector3(-carW / 2, LoofH, 0),    // 6
+      new THREE.Vector3(-carW / 2, LoofH, -carL / 4), // 7
+  ];
+
+  // 車の作成
+  const car = new THREE.Group();
+  let mesh;
+
+  // ボディの作成
+  mesh = new THREE.Mesh(new THREE.BoxGeometry(carW, carH, carL), bodyMaterial);
+  mesh.position.y = -0.75;
+  car.add(mesh);
+
+  // 屋根の作成
+  mesh = new THREE.Mesh(new THREE.BoxGeometry(carW,carH*1.5,carL/2),bodyMaterial);
+  mesh.position.z=-1.5;
+  car.add(mesh);
+
+
+  // タイヤの作成
+  const tyreR = 0.8;
+  const tyreW = 0.5;
+
+  for (let z of [3 / 8 * carL, 3 / 8 * -carL]) {
+      for (let x of [carW / 2, -carW / 2]) {
+          mesh = new THREE.Mesh(
+              new THREE.CylinderGeometry(tyreR, tyreR, tyreW, 16, 1),
+              tyreMaterial
+          );
+          mesh.rotation.z = Math.PI / 2;
+          mesh.position.set(x, -carH, z);
+          car.add(mesh);
+      }
   }
+
+  // 高さの調整
+  car.position.y = carH + tyreR;
+
+  return car;
+};
+
+// レース用の車を生成
+const carColors = ["red", "blue", "green", "black"];
+const cars = [];
+for (let i = 0; i < 4; i++) {
+  const car = createCar(carColors[i]);
+  car.position.set(-10, 2.5, i * 5 -7.5); // 車の初期位置
+  car.rotation.y = 0.5 * Math.PI;
+  cars.push(car);
+  scene.add(car);
+}
 
   // ゴールライン
   const goalLine = new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(10, 0, -6),
-      new THREE.Vector3(10, 0, 6),
+      new THREE.Vector3(22, 0, -12),
+      new THREE.Vector3(22, 0, 12),
     ]),
     new THREE.LineBasicMaterial({ color: "white" })
   );
   scene.add(goalLine);
 
   //平面の設定
-  const planeGeometry = new THREE.PlaneGeometry(20, 15);
+  const planeGeometry = new THREE.PlaneGeometry(60, 30);
   const planeMaterial = new THREE.MeshLambertMaterial({ color: 0x303030});
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -0.5 * Math.PI;
@@ -101,19 +148,12 @@ function init() {
   scene.add(plane);
 
   //光源の設定
-  const spotLight = new THREE.SpotLight(0xffffff, 500);
-  spotLight.position.set(0, 10, 0);
-  spotLight.castShadow=true;
+  const spotLight = new THREE.SpotLight(0xffffff, 5000);
+  spotLight.position.set(-35, 20, 0);
   scene.add(spotLight);
-
-  const numberOfLights = 30;  // 光源の数
-  const lightIntensity = 30; // 光源の強さ
-
-  for (let i = 0; i < numberOfLights; i++) {
-    const pointLight = new THREE.PointLight(0xffffff, lightIntensity);
-    pointLight.position.set(-15 + i, 2, 5); // x座標を-5からスタートし、iを足していく
-    scene.add(pointLight);
-  }
+  const spotLight2 = new THREE.SpotLight(0xffffff, 5000);
+  spotLight2.position.set(35, 20, 0);
+  scene.add(spotLight2);
 
 
   // スタートボタンを作成
@@ -148,8 +188,8 @@ function init() {
     if (raceStarted && !raceFinished) {
       // 車をランダムに進める
       cars.forEach((car, index) => {
-        car.position.x += Math.random() * 0.1; // ランダムな速度
-        if (car.position.x >= 10 && !winners.includes(carColors[index])) {
+        car.position.x += Math.random() * 0.3; // ランダムな速度
+        if (car.position.x >= 20 && !winners.includes(carColors[index])) {
           winners.push(carColors[index]); // 色を格納
         }
       });
